@@ -1,11 +1,12 @@
 #include "hashmap.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
-static unsigned int hash(const char* key) {
+static unsigned int hash(const char* key, int length) {
     unsigned int hashValue = 0;
-    while (*key) {
-        hashValue = (hashValue << 5) + *key++;
+    for (int i = 0; i < length; i++) {
+        hashValue = (hashValue << 5) + key[i];
     }
     return hashValue % HASHMAP_CAPACITY;
 }
@@ -17,7 +18,11 @@ void initHashMap(HashMap* map) {
 }
 
 void hashMapInsert(HashMap* map, const char* key, TokenType value) {
-    unsigned int index = hash(key);
+    int length = 0;
+    while (key[length] != '\0') {
+        length++;
+    }
+    unsigned int index = hash(key, length);
     HashNode* newNode = (HashNode*) malloc(sizeof(HashNode));
     newNode->key = strdup(key);
     newNode->value = value;
@@ -25,11 +30,11 @@ void hashMapInsert(HashMap* map, const char* key, TokenType value) {
     map->table[index] = newNode;
 }
 
-TokenType hashMapGet(HashMap* map, const char* key) {
-    unsigned int index = hash(key);
+TokenType hashMapGet(HashMap* map, const char* key, int length) {
+    unsigned int index = hash(key, length);
     HashNode* node = map->table[index];
     while (node) {
-        if (strcmp(node->key, key) == 0) {
+        if (strlen(node->key) == length && strncmp(node->key, key, length) == 0) {
             return node->value;
         }
         node = node->next;

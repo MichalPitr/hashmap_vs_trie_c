@@ -147,8 +147,9 @@ static TokenType checkKeyword(int start, int length, const char* rest, TokenType
     return TOKEN_IDENTIFIER;
 }
 
-static TokenType identifierTypeUsingHashMap() {
-    TokenType type = hashMapGet(&keywords, scanner.start);
+TokenType identifierTypeUsingHashMap() {
+    int length = scanner.current - scanner.start;
+    TokenType type = hashMapGet(&scanner.keywords, scanner.start, length);
     return type == TOKEN_EOF ? TOKEN_IDENTIFIER : type;
 }
 

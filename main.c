@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-#include "hashtable.h"
+#include "hashmap.h"
 #include "scanner.h"
 
 static char* readFile(const char* path) {
@@ -50,11 +51,17 @@ static void runFile(const char* path) {
     initScanner(source);
     // Prime the scanner.
     Token token;
+    
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    
     while (token.type != TOKEN_EOF) {
         advance(&token);
-        printf("token: %d\n", token.type);
     }
-
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    double elapsed = (end.tv_sec - start.tv_sec) + 
+                 ((end.tv_nsec - start.tv_nsec)/1e9);
+    printf("%f\n", elapsed);
     // readfile allocates memory and passes freeing it to us.
     free(source);
 }
