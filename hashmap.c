@@ -2,13 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
-static unsigned int hash(const char* key, int length) {
-    unsigned int hashValue = 0;
+static uint32_t hash(const char* key, int length) {
+    uint32_t hash = 2166136261u;
     for (int i = 0; i < length; i++) {
-        hashValue = (hashValue << 5) + key[i];
+        hash ^= (uint8_t)key[i]; // xor
+        hash *= 16777619; // scatter data around
     }
-    return hashValue % HASHMAP_CAPACITY;
+    return hash % HASHMAP_CAPACITY;
 }
 
 void initHashMap(HashMap* map) {
@@ -22,24 +24,25 @@ void hashMapInsert(HashMap* map, const char* key, TokenType value) {
     while (key[length] != '\0') {
         length++;
     }
-    unsigned int index = hash(key, length);
+    uint32_t index = hash(key, length);
     HashNode* newNode = (HashNode*) malloc(sizeof(HashNode));
     newNode->key = strdup(key);
+    newNode->keyLength = strlen(newNode->key);
     newNode->value = value;
     newNode->next = map->table[index];
     map->table[index] = newNode;
 }
 
 TokenType hashMapGet(HashMap* map, const char* key, int length) {
-    unsigned int index = hash(key, length);
+    uint32_t index = hash(key, length);
     HashNode* node = map->table[index];
     while (node) {
-        if (strlen(node->key) == length && strncmp(node->key, key, length) == 0) {
+        if (node->keyLength == length && strncmp(node->key, key, length) == 0) {
             return node->value;
         }
         node = node->next;
     }
-    return TOKEN_EOF;
+    return TOKEN_IDENTIFIER;
 }
 
 void freeHashMap(HashMap* map) {

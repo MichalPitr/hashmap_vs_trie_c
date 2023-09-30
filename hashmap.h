@@ -7,6 +7,7 @@
 
 typedef struct HashNode {
     char* key;
+    int keyLength;
     TokenType value;
     struct HashNode* next;
 } HashNode;
@@ -22,7 +23,7 @@ void initHashMap(HashMap* map);
 void hashMapInsert(HashMap* map, const char* key, TokenType value);
 
 // Fetches the value associated with a given key from the hashmap.
-// Returns `TOKEN_EOF` if key doesn't exist.
+// Returns `TOKEN_IDENTIFIER` if key doesn't exist.
 TokenType hashMapGet(HashMap* map, const char* key, int length);
 
 // Frees resources associated with the hashmap.
